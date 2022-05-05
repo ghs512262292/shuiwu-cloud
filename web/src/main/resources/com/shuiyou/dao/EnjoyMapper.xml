@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.shuiyou.dao.EnjoyDao">
+
+    <select id="getAllData" resultType="com.shuiyou.domain.Enjoy">
+        select * from enjoy
+    </select>
+
+    <select id="getClauseEnjoy" resultType="int">
+        select clause_id
+        from enjoy e, clause_enjoy ce
+        where e.id = #{id} and e.id = ce.enjoy_id
+    </select>
+    <select id="getByName" resultType="com.shuiyou.domain.Enjoy">
+        select * from enjoy where name = #{name}
+    </select>
+
+
+</mapper>
