@@ -6,12 +6,12 @@ import com.shuiyou.domain.All_data;
 import com.shuiyou.domain.vo.enjoy.EnjoyQueryVo;
 import com.shuiyou.service.QueryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-
 
 @RestController
 @RequestMapping("/query")

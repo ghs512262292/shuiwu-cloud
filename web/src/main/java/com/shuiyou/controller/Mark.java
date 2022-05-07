@@ -6,10 +6,7 @@ import com.shuiyou.controller.utils.Result;
 import com.shuiyou.domain.All_data;
 import com.shuiyou.service.MarkService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -48,6 +45,23 @@ public class Mark {
         result.setFlag(true);
         result.setData(extractData);
         result.setMsg("抽取成功！");
+        return result;
+    }
+
+
+    /**
+     * 使用了本地测试python注册nacos服务的功能
+     * 目前对于本项目正式功能来说无效
+     * @param name
+     * @return
+     */
+    @GetMapping("/test/{name}")
+    public Result test(@PathVariable("name") String name) {
+        Object test = markService.test(name);
+        Result result = new Result();
+        result.setFlag(true);
+        result.setData(test);
+        result.setMsg("成功！");
         return result;
     }
 }

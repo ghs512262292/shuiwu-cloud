@@ -13,4 +13,6 @@ public interface MarkService {
     Map<String, List<String>> predictReduceEvent(List<String> clauseList);
 
     All_data extract(List<String> reduceList);
+
+    Object test(String name);
 }

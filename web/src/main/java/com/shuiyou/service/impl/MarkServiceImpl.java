@@ -1,5 +1,6 @@
 package com.shuiyou.service.impl;
 
+import com.shuiyou.clients.PythonClient;
 import com.shuiyou.domain.All_data;
 import com.shuiyou.service.MarkService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,8 @@ public class MarkServiceImpl implements MarkService {
     @Autowired
     RestTemplate restTemplate;
 
+    @Autowired
+    PythonClient pythonClient;
     @Override
     public List<String> splitText(String text) {
 
@@ -34,5 +37,11 @@ public class MarkServiceImpl implements MarkService {
     @Override
     public All_data extract(List<String> reduceList) {
         return null;
+    }
+
+    @Override
+    public Object test(String name) {
+        Object o = pythonClient.testPython(name);
+        return o;
     }
 }

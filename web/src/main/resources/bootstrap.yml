@@ -1,0 +1,14 @@
+#spring:
+#  application:
+#    name: webService # web服务名称
+#  cloud:
+#    nacos:
+#      server-addr: localhost:8848 # nacos服务地址
+#      config:
+#        file-extension: yaml # 文件后缀名
+#  config:
+#    activate:
+#      on-profile: dev
+
+# 由于springboot版本过高，然而nacos高版本不支持M1，因此这里就不适用bootstrap，yml作为配置，也就是放弃了nacos的配置中心，在每个-
+# 项目中手动配置nacos，并且现在自己这个项目目前还没有需要热配置的一个情况，有这个了解就可以了
