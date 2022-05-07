@@ -30,7 +30,7 @@ public class Mark {
 
     @GetMapping("/reduceEvent")
     public Result predictReduceEvent(List<String> clauseList) {
-        Map<String, List<String>> map = markService.predictReduceEvent(clauseList);
+        Object map = markService.predictReduceEvent(clauseList);
         Result result = new Result();
         result.setFlag(true);
         result.setData(map);
@@ -39,14 +39,26 @@ public class Mark {
     }
 
     @GetMapping("/extract")
-    public Result extract(List<String> reduceList) {
-        All_data extractData = markService.extract(reduceList);
+    public Result extract(List<String> reduceList, String text) {
+        Object extractData = markService.extract(reduceList, text);
         Result result = new Result();
         result.setFlag(true);
-        result.setData(extractData);
+//        result.setData(extractData);
         result.setMsg("抽取成功！");
         return result;
     }
+
+
+    @GetMapping("/storage_data")
+    public Result storageData(Map<String, Object> map) {
+        String res = markService.storageData(map);
+        Result result = new Result();
+        result.setFlag(true);
+        result.setData(res);
+        result.setMsg(res);
+        return result;
+    }
+
 
 
     /**
