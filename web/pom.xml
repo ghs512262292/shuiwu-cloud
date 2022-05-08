@@ -37,10 +37,10 @@
         </dependency>
 
         <!--为了使bootstrap配置文件优先加载-->
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-bootstrap</artifactId>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.cloud</groupId>-->
+<!--            <artifactId>spring-cloud-starter-bootstrap</artifactId>-->
+<!--        </dependency>-->
 
         <!--feign客户端依赖-->
         <dependency>

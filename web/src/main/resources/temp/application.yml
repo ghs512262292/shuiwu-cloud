@@ -1,9 +1,13 @@
-# 主环境配置公用信息，并且选择不同的开发环境以配置不同的开发环境不同的信息
-
 spring:
   profiles:
     active: pro
 
+---
+# 开发环境
+server:
+  port: 80
+
+spring:
   datasource:
     druid:
       driver-class-name: com.mysql.cj.jdbc.Driver
@@ -15,7 +19,9 @@ spring:
   cloud:
     nacos:
       server-addr: 47.105.158.15:9010 # nacos服务地址
-
+  config:
+    activate:
+      on-profile: dev
 
 # 之前的注册中心eureka配置（现在舍弃，使用nacos配置）
 #eureka:
@@ -23,6 +29,43 @@ spring:
 #    service-url:
 #      defaultZone: http://127.0.0.1:9001/eureka
 
+
+# mybatis配置服务
+mybatis-plus:
+  configuration:
+    # 是否开启自动驼峰命名规则（camel case）映射，即从经典数据库列名 A_COLUMN（下划线命名） 到经典 Java 属性名 aColumn（驼峰命名） 的类似映射
+    map-underscore-to-camel-case: false
+    # 开启MP的常规日志（输出到控制台）
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  # 取消雪花算法，使用主键ID自增长
+  global-config:
+    db-config:
+      id-type: auto
+    # 关闭mybatis-plus Banner图案
+    banner: false
+  # 在Mybatis-PLUS中注册XML配置文件的配置
+  mapper-locations: classpath*:com/shuiyou/dao/*.xml
+
+---
+# 部署环境
+server:
+  port: 9002
+
+spring:
+  datasource:
+    druid:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://47.105.158.15:3306/shuiyou
+      username: sqlshui
+      password: gagcik-nozduz
+  application:
+    name: java-webservice # web服务名称
+  cloud:
+    nacos:
+      server-addr: 47.105.158.15:9010 # nacos服务地址
+  config:
+    activate:
+      on-profile: pro
 
 # mybatis配置服务
 mybatis-plus:
