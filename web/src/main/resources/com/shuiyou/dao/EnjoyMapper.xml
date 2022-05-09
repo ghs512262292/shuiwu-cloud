@@ -5,8 +5,12 @@
 
 <mapper namespace="com.shuiyou.dao.EnjoyDao">
 
-    <select id="getAllData" resultType="com.shuiyou.domain.Enjoy">
+    <!--<select id="getAllData" resultType="com.shuiyou.domain.Enjoy">
         select * from enjoy
+    </select>-->
+
+    <select id="getAllData" resultType="string">
+        select name from enjoy
     </select>
 
     <select id="getClauseEnjoy" resultType="int">
@@ -14,8 +18,13 @@
         from enjoy e, clause_enjoy ce
         where e.id = #{id} and e.id = ce.enjoy_id
     </select>
-    <select id="getByName" resultType="com.shuiyou.domain.Enjoy">
-        select * from enjoy where name = #{name}
+    <select id="getByNameToAllData" resultType="com.shuiyou.domain.All_data">
+        select clause_text, enjoy, title, textID, mode, policyClassification, type, taxType, date, notice.N_id, C_id
+        from enjoy, clause_enjoy, clause, notice
+        where name = #{name}
+          and enjoy.id = clause_enjoy.enjoy_id
+          and clause_enjoy.clause_id = clause.C_id
+          and clause.N_id = notice.N_id
     </select>
 
 

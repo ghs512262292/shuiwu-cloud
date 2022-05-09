@@ -1,6 +1,7 @@
 package com.shuiyou.dao;
 
 
+import com.shuiyou.domain.All_data;
 import com.shuiyou.domain.Enjoy;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +19,8 @@ public class EnjoyDaoTest {
     @Test
     void getByName() {
         String name = "纳税人";
-        Enjoy enjoy = enjoyDao.getByName(name);
-        System.out.println(enjoy);
+        List<All_data> all_data = enjoyDao.getByNameToAllData(name);
+        System.out.println(all_data);
     }
 
     @Test
@@ -33,7 +34,7 @@ public class EnjoyDaoTest {
 
     @Test
     void getAllData() {
-        List<Enjoy> allData = enjoyDao.getAllData();
+        List<String> allData = enjoyDao.getAllData();
         for (int i = 0; i < 5; i++) {
             System.out.println(allData.get(i));
         }

@@ -3,6 +3,8 @@ package com.shuiyou.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.shuiyou.clients.PythonClient;
+import com.shuiyou.controller.Mark;
 import com.shuiyou.controller.utils.MySimHash;
 import com.shuiyou.dao.All_dataDao;
 import com.shuiyou.dao.ClauseDao;
@@ -14,10 +16,13 @@ import com.shuiyou.domain.vo.enjoy.EnjoyQueryDataVo;
 import com.shuiyou.domain.vo.enjoy.EnjoyQueryVo;
 import com.shuiyou.service.QueryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.redis.core.SetOperations;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class QueryServiceImpl implements QueryService {
@@ -29,6 +34,12 @@ public class QueryServiceImpl implements QueryService {
 
     @Autowired
     EnjoyDao enjoyDao;
+
+    @Autowired
+    StringRedisTemplate stringRedisTemplate;
+
+    @Autowired
+    PythonClient pythonClient;
 
     @Override
     public List<All_data> selectPageAll(int currPage, int size) {
@@ -54,27 +65,15 @@ public class QueryServiceImpl implements QueryService {
 
     @Override
     public EnjoyQueryVo selectEnjoy(String name) {
-        // 1.首先为了获取相似的享受主体，因此要获取数据库中所有的享受主体的信息
-        List<Enjoy> allData = enjoyDao.getAllData();
+        // 1.首先为了获取相似的享受主体，因此要获取数据库中所有的享受主体的信息,使用了redis缓存
+        Set<String> allData = getEnjoyAllData();
 
-        // 2.计算当前传入的享受主体的simHash
-        String curEnjoy = name;
-        MySimHash curEnjoyHash = new MySimHash(curEnjoy);
-        // 3.建立相似享受主体列表，以便把判断的相似的享受主体保存起来
-        List<Enjoy> similarList = new ArrayList<>();
+        // 2.计算当前传入的享受主体的相似享受主体，这里主要是利用了RPC调用python算法
+        Map<String, Object> map = new HashMap<>();
+        map.put("enjoyList", allData);
+        map.put("enjoy", name);
+        List<String> similarList = pythonClient.getSimilar(map);
 
-        // 4.遍历判断所有的享受主体的simHash值，判断是否加入到相似的享受主体列表中
-        for (Enjoy enjoy : allData) {
-            String similarName = enjoy.getName();
-            // 过去标准享受主体
-            if (similarName.equals(name)) {
-                continue;
-            }
-            MySimHash similarEnjoyHash = new MySimHash(similarName);
-            if (curEnjoyHash.getSemblance(similarEnjoyHash) <= 0.33) {
-                similarList.add(enjoy);
-            }
-        }
 
         // 5.首先构造当前享受主体的数据(并判断当前的输入是否存在)
             // 创建一个最终返回的容器
@@ -84,46 +83,49 @@ public class QueryServiceImpl implements QueryService {
         mainEnjoyDataProcess(name, enjoyQueryVo);
 
         // 6.构造相似享受主体数据
-        for (Enjoy similarEnjoy : similarList) {
-            similarEnjoyDataProcess(similarEnjoy.getName(), enjoyQueryVo);
+        for (String similarEnjoy : similarList) {
+            similarEnjoyDataProcess(similarEnjoy, enjoyQueryVo);
         }
 
         return enjoyQueryVo;
 
     }
 
-
+    public Set<String> getEnjoyAllData() {
+        String enjoyAllData = "enjoyAllData";
+        SetOperations<String, String> ops = stringRedisTemplate.opsForSet();
+        Set<String> data = ops.members(enjoyAllData);
+        return data;
+    }
 
 
     public void mainEnjoyDataProcess(String name, EnjoyQueryVo enjoyQueryVo) {
-        Enjoy enjoy = enjoyDao.getByName(name);
+        List<All_data> all_data = enjoyDao.getByNameToAllData(name);
             // 获取当前享受主体所对应的clauseID(条款ID)
-        if (enjoy == null) {
+        if (all_data == null) {
             enjoyQueryVo.setStandardData(null);
             return;
         }
-        List<Integer> clauseList = enjoyDao.getClauseEnjoy(enjoy.getId());
-        for (Integer i : clauseList) {
-            All_data enjoyData = all_dataDao.selectAllByC_id(i);
+        for (All_data data : all_data) {
             EnjoyQueryDataVo enjoyQueryDataVo = new EnjoyQueryDataVo();
-            enjoyQueryDataVo.setEnjoy(enjoyData.getEnjoy());
-            enjoyQueryDataVo.setData(enjoyData);
-            enjoyQueryDataVo.setTaxType(enjoyData.getTaxType());
+            enjoyQueryDataVo.setEnjoy(data.getEnjoy());
+            enjoyQueryDataVo.setData(data);
+            enjoyQueryDataVo.setTaxType(data.getTaxType());
             enjoyQueryVo.getStandardData().add(enjoyQueryDataVo);
         }
+
     }
     public void similarEnjoyDataProcess(String name, EnjoyQueryVo enjoyQueryVo) {
-        Enjoy enjoy = enjoyDao.getByName(name);
-            // 获取当前享受主体所对应的clauseID(条款ID)
-        List<Integer> clauseList = enjoyDao.getClauseEnjoy(enjoy.getId());
-        for (Integer i : clauseList) {
-            All_data enjoyData = all_dataDao.selectAllByC_id(i);
+        List<All_data> all_data = enjoyDao.getByNameToAllData(name);
+        // 获取当前享受主体所对应的clauseID(条款ID)
+        for (All_data data : all_data) {
             EnjoyQueryDataVo enjoyQueryDataVo = new EnjoyQueryDataVo();
-            enjoyQueryDataVo.setEnjoy(enjoyData.getEnjoy());
-            enjoyQueryDataVo.setData(enjoyData);
-            enjoyQueryDataVo.setTaxType(enjoyData.getTaxType());
-            enjoyQueryVo.getSimilarData().add(enjoyQueryDataVo);
+            enjoyQueryDataVo.setEnjoy(data.getEnjoy());
+            enjoyQueryDataVo.setData(data);
+            enjoyQueryDataVo.setTaxType(data.getTaxType());
+            enjoyQueryVo.getStandardData().add(enjoyQueryDataVo);
         }
+
     }
 
 

@@ -1,10 +1,13 @@
 package com.shuiyou.service;
 
 
+import com.shuiyou.domain.Enjoy;
 import com.shuiyou.domain.vo.enjoy.EnjoyQueryVo;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import java.util.List;
 
 @SpringBootTest
 public class QueryServiceTest {
@@ -18,5 +21,10 @@ public class QueryServiceTest {
         String name = "幼儿园";
         EnjoyQueryVo enjoyQueryVo = queryService.selectEnjoy(name);
         System.out.println(enjoyQueryVo);
+    }
+
+    @Test
+    void getEnjoyAllData() {
+
     }
 }

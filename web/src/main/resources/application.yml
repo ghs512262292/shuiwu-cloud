@@ -2,7 +2,7 @@
 
 spring:
   profiles:
-    active: pro
+    active: dev
 
   datasource:
     druid:
@@ -15,8 +15,17 @@ spring:
   cloud:
     nacos:
       server-addr: 47.105.158.15:9010 # nacos服务地址
+  # redis的配置
+  redis:
+    host: 47.105.158.15
+    port: 9009
+    password: 12345678
+    # 选择操作客户端类型，还有 lettuce的type,jedis type
+    client-type: lettuce
 
-
+  cache:
+    type: redis
+#    client-type: jedis
 # 之前的注册中心eureka配置（现在舍弃，使用nacos配置）
 #eureka:
 #  client:

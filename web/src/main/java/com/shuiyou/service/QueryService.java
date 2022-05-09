@@ -3,9 +3,11 @@ package com.shuiyou.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.shuiyou.domain.All_data;
 import com.shuiyou.domain.Clause;
+import com.shuiyou.domain.Enjoy;
 import com.shuiyou.domain.vo.enjoy.EnjoyQueryVo;
 
 import java.util.List;
+import java.util.Set;
 
 public interface QueryService {
 
@@ -28,4 +30,6 @@ public interface QueryService {
     IPage selectPageAll(int currPage, int size, Clause clause);
 
     EnjoyQueryVo selectEnjoy(String name);
+
+
 }

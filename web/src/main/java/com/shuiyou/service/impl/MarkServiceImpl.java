@@ -41,6 +41,7 @@ public class MarkServiceImpl implements MarkService {
     @Override
     public String storageData(Map<String, Object> map) {
         String res = pythonClient.storageData(map);
+
         return res;
     }
 

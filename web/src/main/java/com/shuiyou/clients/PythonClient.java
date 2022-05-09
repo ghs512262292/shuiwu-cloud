@@ -25,4 +25,7 @@ public interface PythonClient {
     @PostMapping("/storage_data")
     String storageData(@RequestBody Map<String, Object> map);
 
+    @PostMapping("/forest/query")
+    List<String> getSimilar(@RequestBody Map<String, Object> map);
+
 }
